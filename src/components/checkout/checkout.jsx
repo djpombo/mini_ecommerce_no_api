@@ -10,12 +10,9 @@ import { Formik } from 'formik';
 import * as yup from 'yup';
 import { formatarCpf, validarCpf } from '../../utils/cpf.util';
 import { formatarCep } from '../../utils/cep.util';
-import axios from 'axios';
 import './styles.css';
 
 registerLocale('pt', pt);
-
-const CHECKOUT_URL='http://localhost:3001/mini-ecommerce/checkout/finalizar-compra';
 
 function Checkout(props) {
 
@@ -23,7 +20,8 @@ function Checkout(props) {
     const [formEnvaido, setFormEnviado] = useState(false);
     const [showModal, setShowModal] = useState(false);
     const [showErroModal, setShowErroModal] = useState(false);
-
+    const [showModalNota, setShowModalNota] = useState(false);
+    
     //configuracao do yup para validacao do form
     const schema = yup.object({
         email: yup.string().email().required(),
@@ -43,9 +41,9 @@ function Checkout(props) {
         return props.visivel ? null : 'hidden';
     }
 
-    async function finalizarCompra(dados) {
+    function finalizarCompra(dados) {
 
-        if(!dataNascimento){
+        if (!dataNascimento) {
             setFormEnviado(true);
             return;
         }
@@ -53,16 +51,10 @@ function Checkout(props) {
         dados.produtos = JSON.stringify(props.produtos);
         dados.total = `R$: ${props.total}`;
 
-        try{            
-                await axios.post(CHECKOUT_URL, dados);
-                setShowModal(true);
-                props.handleLimparCarrinho();
+        setShowModal(true);
+        props.handleLimparCarrinho();
+        
        
-        } catch (error) {
-
-            setShowErroModal(true);
-
-        }
 
     }
 
@@ -93,7 +85,12 @@ function Checkout(props) {
 
     }
 
-    function handleFecharErroModal(){
+    function handleContinuarNota() {
+        setShowModalNota(false);
+    }
+
+    
+    function handleFecharErroModal() {
         setShowErroModal(false);
     }
 
@@ -410,6 +407,30 @@ function Checkout(props) {
                         </Button>
                     </Modal.Footer>
 
+                </Modal>
+
+                <Modal show={showModalNota}
+                    data-testid="modal-compra-nota"
+                    onHide={handleContinuarNota}
+                >
+                    <Modal.Header closeButton>
+                        <Modal.Title>
+                            Nota Fiscal de Compra
+                        </Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                       
+                          
+                       
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button
+                            variant="success"
+                            onClick={handleContinuarNota}
+                        >
+                            Continuar
+                        </Button>
+                    </Modal.Footer>
                 </Modal>
 
             </div>
